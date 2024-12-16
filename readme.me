@@ -1,0 +1,116 @@
+# Sistema Flask para Teste de Backend
+
+Este projeto implementa um sistema simples usando Flask com autenticação JWT, rotas protegidas e permissões baseadas em roles.
+
+## Instalação
+
+Siga os passos abaixo para configurar e executar o projeto:
+
+### Pré-requisitos
+- Python 3.8 ou superior
+- Virtualenv (opcional, mas recomendado)
+
+### Passo 1: Clonar o Repositório
+```bash
+git clone https://github.com/leonardofguedes/fbk2
+cd fbk2
+```
+e modifique o arquivo env.example para .env com a variável FAKE_BASE_URL
+
+### Passo 2: Criar um Ambiente Virtual
+```bash
+python3 -m venv venv
+source venv/bin/activate  # Linux/Mac
+venv\Scripts\activate     # Windows
+```
+
+### Passo 3: Instalar Dependências
+```bash
+pip install -r requirements.txt
+```
+
+### Passo 4: Rodar o Servidor
+Execute o comando abaixo para iniciar o servidor:
+```bash
+python app.py
+```
+O servidor estará rodando em http://127.0.0.1:5000.
+
+## Testando o Código
+
+### Testar a Geração de Token
+Use a rota `/token` para gerar um token JWT. Exemplo de requisição usando curl:
+```bash
+curl -X POST http://127.0.0.1:5000/token -H "Content-Type: application/json" -d '{"username": "user", "password": "L0XuwPOdS5U"}'
+```
+Resposta esperada:
+```json
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+### Testar a Geração de Token (Admin)
+Use a rota `/token` para gerar um token JWT. Exemplo de requisição usando curl:
+```bash
+curl -X POST http://127.0.0.1:5000/token -H "Content-Type: application/json" -d '{"username": "admin", "password": "JKSipm0YH"}'
+```
+Resposta esperada:
+```json
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+### Testar Rota Protegida /user
+Acesse a rota `/user` enviando o token no cabeçalho Authorization. Exemplo:
+```bash
+curl -H "Authorization: Bearer <token>" http://127.0.0.1:5000/user
+```
+Resposta esperada (se o token for válido e o usuário tiver o papel user):
+```json
+{
+  "msg": "Bem-vindo, user"
+}
+```
+
+### Testar Rota Protegida /admin
+Acesse a rota `/admin` enviando o token no cabeçalho Authorization. Exemplo:
+```bash
+curl -H "Authorization: Bearer <token>" http://127.0.0.1:5000/admin
+```
+Se o token for de um usuário com o papel user, a resposta será:
+```json
+{
+  "msg": "Acesso negado para este recurso"
+}
+```
+Se o token for de um administrador, a resposta será:
+```json
+{
+  "msg": "Bem-vindo, admin"
+}
+```
+
+### Testar Rota Protegida /health
+Acesse a rota `/health` enviando o token no cabeçalho Authorization. Exemplo:
+```bash
+curl -H "Authorization: Bearer <token>" http://127.0.0.1:5000/health
+```
+Resposta esperada:
+```json
+{
+    "status": "ok",
+    "message": "API is healthy"
+}
+```
+
+## Rodando os Testes Automatizados
+Os testes automatizados estão localizados no diretório `tests`. Para executá-los, use o comando:
+```bash
+python -m unittest discover tests
+```
+Os testes irão validar:
+- A geração do token JWT.
+- O acesso às rotas protegidas com os tokens corretos.
+- Bloqueio de acesso não autorizado.
